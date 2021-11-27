@@ -1,0 +1,25 @@
+# INFLUXDB EXPORT: 1677-09-21T00:12:43Z - 2262-04-11T23:47:16Z
+# DDL
+CREATE DATABASE csc591 WITH NAME autogen
+# DML
+# CONTEXT-DATABASE:csc591
+# CONTEXT-RETENTION-POLICY:autogen
+# writing tsm data
+records,Token=abcd Acceleration=5 1524006639568972136
+records,Token=abcd Acceleration=1 1524006699568972332
+records,Token=abcd FuelRemaining=50 1524006639568972136
+records,Token=abcd FuelRemaining=25 1524006699568972332
+records,Token=abcd HeartRate=120 1524006639568972136
+records,Token=abcd HeartRate=130 1524006699568972332
+records,Token=abcd Lat=36.00511 1524006639568972136
+records,Token=abcd Lat=35.995738 1524006699568972332
+records,Token=abcd Lng=-78.92776 1524006639568972136
+records,Token=abcd Lng=-78.904028 1524006699568972332
+records,Token=abcd Speed=45 1524006639568972136
+records,Token=abcd Speed=35 1524006699568972332
+records,Token=efgh Acceleration=0 1524006639568972514
+records,Token=efgh FuelRemaining=0 1524006639568972514
+records,Token=efgh HeartRate=0 1524006639568972514
+records,Token=efgh Lat=0 1524006639568972514
+records,Token=efgh Lng=0 1524006639568972514
+records,Token=efgh Speed=0 1524006639568972514

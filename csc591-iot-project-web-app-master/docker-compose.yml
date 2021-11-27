@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+  api:
+    image: csc591-api
+    build:
+      context: api/
+      args:
+        src_dir: /go/src/github.ncsu.edu/jmnance/csc591-iot-project-web-app/api/
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api/:/go/src/github.ncsu.edu/jmnance/csc591-iot-project-web-app/api/
+    environment:
+      - "INFLUXDB_HOST=influxdb"
+      - "INFLUXDB_PORT=8086"
+      - "INFLUXDB_DB=csc591"
+    depends_on:
+      - influxdb
+
+  webpack:
+    build: frontend/
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src/:/frontend/src/
+      - ./frontend/public/:/frontend/public/
+      - ./frontend/.flowconfig:/frontend/.flowconfig
+      - ./frontend/package.json:/frontend/package.json
+      - ./frontend/yarn.lock:/frontend/yarn.lock
+      - ./frontend/build:/frontend/build/
+    depends_on:
+      - api
+
+  influxdb:
+    image: influxdb:1.5
+    ports:
+      - 8086:8086
+    volumes:
+      - influx_data:/var/lib/influxdb
+    environment:
+      - "INFLUXDB_DB=csc591"
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./deploy/mosquitto_passwd:/etc/mosquitto/passwd
+      - ./deploy/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  db_watcher:
+    image: csc591-db-watcher
+    build: db_watcher/
+    volumes:
+      - ./db_watcher/:/code
+    depends_on:
+      - influxdb
+    environment:
+      - "MQTT_USER=${MQTT_USER}"
+      - "MQTT_HOST=${MQTT_HOST}"
+      - "MQTT_PASSWORD=${MQTT_PASSWORD}"
+
+volumes:
+  influx_data:
+    external: true
+  mosquitto_data:
+    external: true
+  mosquitto_log:
+    external: true

@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  influxdb:
+    image: influxdb:1.5
+    restart: always
+    volumes:
+      - influx_data:/var/lib/influxdb
+      - ./influxdata.txt:/influxdata.txt
+    environment:
+      - "INFLUXDB_DB=csc591"
+
+  api:
+    image: us.gcr.io/delta-geode-199714/csc591-api
+    restart: always
+    environment:
+      - "INFLUXDB_HOST=influxdb"
+      - "INFLUXDB_PORT=8086"
+      - "INFLUXDB_DB=csc591"
+    depends_on:
+      - influxdb
+
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./csc591.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./build:/var/www:ro
+    depends_on:
+      - api
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./mosquitto_passwd:/etc/mosquitto/passwd
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  db_watcher:
+    image: us.gcr.io/delta-geode-199714/csc591-db-watcher
+    restart: always
+    depends_on:
+      - influxdb
+    environment:
+      - "MQTT_USER=${MQTT_USER}"
+      - "MQTT_HOST=${MQTT_HOST}"
+      - "MQTT_PASSWORD=${MQTT_PASSWORD}"
+
+volumes:
+  influx_data:
+    external: true
+  mosquitto_data:
+    external: true
+  mosquitto_log:
+    external: true
